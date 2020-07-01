@@ -1,0 +1,159 @@
+// Kellan Delaney
+// 07/01/2020
+// Snake.jack
+// Implements a graphical snake, essentially as a linked list
+
+class Snake {
+	field int x, y; // screen location of the top-left corner of head
+	field int size; // size of each snake segment in pixels
+	field Snake tail; // the next segment of the snake
+	field int prevDir; // the last move the snake made
+
+	// Constructs a new Snake
+	constructor Snake new(int Ax, int Ay, Snake Atail, int Asize, int direction) {
+		let x = Ax;
+		let y = Ay;
+		let size = Asize;
+		let tail = Atail;
+		let prevDir = direction;
+		do draw();
+		return this;
+	}
+
+	// Disposes the snake
+	method void dispose() {
+		if (~(tail = null)) { do Memory.deAlloc(tail); } 
+		do Memory.deAlloc(this);
+		return;
+	}
+
+	// Draws the snake on the screen
+	method void draw() {
+		do Screen.setColor(true);
+		do Screen.drawRectangle(x, y, x + size - 1, y + size - 1);
+		if (~(tail = null)) { do tail.draw(); }
+		return;
+	}
+
+	// Erases the snake from the screen
+	method void erase() {
+		do Screen.setColor(false);
+		do Screen.drawRectangle(x, y, x + size - 1, y + size - 1);
+		if (~(tail = null)) { do tail.erase(); }
+		return;
+	}
+
+	// Moves the square up by (size) pixels
+	method void moveUp() {
+		if (y > 0) {
+			do erase();
+			let y = y - size;
+			do draw();
+		}
+		if (~(tail = null)) {
+			if (prevDir = 1) { do tail.moveUp(); }
+			if (prevDir = 2) { do tail.moveDown(); }
+			if (prevDir = 3) { do tail.moveLeft(); }
+			if (prevDir = 4) { do tail.moveRight(); }
+		}
+		let prevDir = 1;
+		return;
+	}
+
+	// Moves the square down by (size) pixels
+	method void moveDown() {
+		if (y < 247) {
+			do erase();
+			let y = y + size;
+			do draw();
+		}
+		if (~(tail = null)) {
+			if (prevDir = 1) { do tail.moveUp(); }
+			if (prevDir = 2) { do tail.moveDown(); }
+			if (prevDir = 3) { do tail.moveLeft(); }
+			if (prevDir = 4) { do tail.moveRight(); }
+		}
+		let prevDir = 2;
+		return;
+	}
+
+	// Moves the square left by (size) pixels
+	method void moveLeft() {
+		if (x > 0) {
+			do erase();
+			let x = x - size;
+			do draw();
+		}
+		if (~(tail = null)) {
+			if (prevDir = 1) { do tail.moveUp(); }
+			if (prevDir = 2) { do tail.moveDown(); }
+			if (prevDir = 3) { do tail.moveLeft(); }
+			if (prevDir = 4) { do tail.moveRight(); }
+		}
+		let prevDir = 3;
+		return;
+	}
+
+	// Moves the square right by (size) pixels
+	method void moveRight() {
+		if (x < 503) {
+			do erase();
+			let x = x + size;
+			do draw();
+		}
+		if (~(tail = null)) {
+			if (prevDir = 1) { do tail.moveUp(); }
+			if (prevDir = 2) { do tail.moveDown(); }
+			if (prevDir = 3) { do tail.moveLeft(); }
+			if (prevDir = 4) { do tail.moveRight(); }
+		}
+		let prevDir = 4; 
+		return;
+	}
+
+	// Returns the current x value
+	method int getX() {
+		return x;
+	}
+	
+	// Returns the current y value
+	method int getY() {
+		return y;
+	}
+
+	// Returns the tail of the snake
+	method Snake getTail() {
+		return tail;
+	}
+
+	// Checks if certain coordinates are covered by the snake
+	method boolean checkCoords(int a, int b) {
+		if ((a = x) & (b = y)) { return true; }
+		if (~(tail = null)) { return tail.checkCoords(a, b); }
+		return false;
+	}
+
+	// Adds an additional segment to the snake
+	method void grow() {
+		if (tail = null) {
+			if (prevDir = 1) { 
+				let tail = Snake.new(x, y+size, null, size, prevDir);
+				return;
+			}
+			if (prevDir = 2) {
+				let tail = Snake.new(x, y-size, null, size, prevDir);
+				return;
+			}
+			if (prevDir = 3) {
+				let tail = Snake.new(x+size, y, null, size, prevDir);
+				return;
+			}
+			if (prevDir = 4) {
+				let tail = Snake.new(x-size, y, null, size, prevDir);
+				return;
+			}
+		}
+		do tail.grow();
+		return;
+	}
+}

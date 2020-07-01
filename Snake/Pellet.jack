@@ -1,0 +1,48 @@
+// Kellan Delaney
+// 07/01/2020
+// Pellet.jack
+// Implements a graphical pellet, as a linked list
+
+class Pellet {
+	field int x, y; // screen location of top left corner of pellet
+	field int radius; // radius of pellet
+
+	// Constructs a new Pellet
+	constructor Pellet new(int Ax, int Ay) {
+		let x = Ax;
+		let y = Ay;
+		let radius = 3;
+		do draw();
+		return this;
+	}
+
+	// Disposes the pellet
+	method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+	}
+
+	// Draws the pellet on the screen
+	method void draw() {
+		do Screen.setColor(true);
+		do Screen.drawCircle(x+4, y+4, radius);
+		return;
+	}
+
+	// Erases the pellet: not used?
+	method void erase() {
+		do Screen.setColor(false);
+		do Screen.drawCircle(x, y, radius);
+		return;
+	}
+
+	// Returns the current x value
+	method int getX() {
+		return x;
+	}
+
+	// Returns the current y value
+	method int getY() {
+		return y;
+	}
+}

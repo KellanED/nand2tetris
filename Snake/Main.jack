@@ -1,0 +1,14 @@
+// Kellan Delaney
+// 07/01/2020
+// Main.jack
+// Initializes a Snake game
+
+class Main {
+	function void main() {
+	var SnakeGame game;
+	let game = SnakeGame.new();
+	do game.run();
+	do game.dispose();
+	return;
+	}
+}

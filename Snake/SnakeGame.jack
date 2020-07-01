@@ -1,0 +1,153 @@
+// Kellan Delaney
+// 07/01/2020
+// SnakeGame.jack
+// Implements the Snake game
+
+/**
+ * This game is similar to any other Snake game. The snake starts off
+ * small. The player can move the snake towards pellets which it eats
+ * to get bigger. The snake continuously moves and if it hits the wall
+ * or its tail, it starts over.
+ */
+
+class SnakeGame {
+	field Snake snake; // the snake
+	field int direction; // the snake's current direction
+			     // 0=none (game start), 1=up, 2=down, 3=left, 4=right
+	field Pellet pellet; // the current pellet on the board
+	field boolean exit;
+	static int n; // number used for generating random pellet placement
+
+	// Constructs a new Snake Game.
+	constructor SnakeGame new() {
+		// Creates a new snake and positions it at the top-left of the screen
+		let snake = Snake.new(0, 0, null, 8, 0);
+		let direction = 0;
+		let n = 5;
+		let exit = false;
+		let pellet = Pellet.new(n*8, n*8);
+		return this;
+	}
+
+	// Disposes the game
+	method void dispose() {
+		do snake.dispose();
+		do pellet.dispose();
+		do Memory.deAlloc(this);
+		return;
+	}
+
+	// Moves the snake in the current direction
+	method void moveSnake() {
+		do checkPellet();
+		if (direction = 1) {
+			if ((snake.getY()=0) | (checkCrash())) {
+				do terminate();
+				return;
+			}
+			do snake.moveUp(); 
+		}
+		if (direction = 2) {
+			if ((snake.getY()=248) | (checkCrash())) {
+				do terminate();
+				return;
+			}
+			do snake.moveDown(); 
+		}
+		if (direction = 3) {
+			if ((snake.getX()=0) | (checkCrash())) {
+				do terminate();
+				return;
+			} 
+			do snake.moveLeft(); 
+		}
+		if (direction = 4) { 
+			if ((snake.getX()=504) | (checkCrash())) {
+				do terminate();
+				return;
+			} 
+			do snake.moveRight(); 
+		}
+		do Sys.wait(100); // delays the next movement
+		return;
+	}
+
+	//Runs the game: handles user inputs and moves the snake
+	method void run() {
+		var char key; // the current key pressed
+		while (~exit) {
+			// waits for key to be pressed
+			while (key = 0) {
+				let key = Keyboard.keyPressed();
+				do moveSnake();
+				if (exit) { return; }
+			}
+			if (key = 81) { do terminate(); }    // q key
+			if (key = 131) { let direction = 1; } // up arrow
+			if (key = 133) { let direction = 2; } // down arrow
+			if (key = 130) { let direction = 3; } // left arrow
+			if (key = 132) { let direction = 4; } // right arrow
+			if (exit) { return; }
+			// waits for key to be released
+			while (~(key = 0)) {
+				let key = Keyboard.keyPressed();
+				do moveSnake();
+				if (exit) { return; }
+			}
+		}
+		return;
+	}
+
+	// Modulus method to assist with "random" method
+	method int mod(int a, int b) {
+		var int c;
+		let c = a-(a/b*b);
+		return c;
+	}
+
+	// Method for determining "random" numbers
+	method int rand(int g) {
+		var int a, b, c;
+		let a = 123;
+		let b = 32;
+		let c = mod((g*a), b);
+		return c;
+	}
+
+	// Checks if the pellet is being eaten by the snake, if so snake grows
+	method void checkPellet() {
+		var int a, b, c, d;
+		let a = pellet.getX();
+		let b = pellet.getY();
+		if (snake.checkCoords(a, b)) {
+			do snake.grow();
+			let n = rand(n);
+			let c = n;
+			let n = rand(n);
+			let d = n;
+			let pellet = Pellet.new(c*8, d*8);
+		}
+		return;
+	}
+
+	// Checks if the snake ran into itself
+	method boolean checkCrash() {
+		var Snake tail;
+		var int a, b;
+		let tail = snake.getTail();
+		if (~(tail = null)) {
+			let a = snake.getX();
+			let b = snake.getY();
+			if (tail.checkCoords(a, b)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// Ends the game
+	method void terminate() {
+		let exit = true;
+		return;
+	}
+}
