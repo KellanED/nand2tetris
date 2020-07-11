@@ -1,0 +1,74 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+// Kellan Delaney
+// 07/10/2020
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+
+    static int memory, next, length;
+    static Array freeList_ref;
+
+    /** Initializes the class. */
+    function void init() {
+        let memory = 0;
+        let length = 0;
+        let next = 1;
+        let freeList_ref = 2048;
+        let freeList_ref[length] = 14336;
+        let freeList_ref[next] = null;
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return memory[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let memory[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+        var Array prev_ref, curr_ref;
+        let curr_ref = freeList_ref;
+        while ((curr_ref[length] < size) | (curr_ref[length] = size)) {
+            let prev_ref = curr_ref;
+            let curr_ref = curr_ref[next];
+            if (curr_ref = 0) {
+                return -1;
+            }
+        }
+        let prev_ref = curr_ref;
+        let curr_ref = curr_ref + curr_ref[length] - size;
+        let prev_ref[length] = prev_ref[length] - size - 1;
+        let curr_ref[-1] = size + 1;
+        return curr_ref;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        var int length;
+        var Array segment, i;
+        let segment = o - 1;
+        let length = o[-1];
+        let i = freeList_ref;
+        while(~(i[1] = 0)) {
+            let i = i[1];
+        }
+        let i[1] = segment;
+        let segment[0] = length;
+        return;
+    }    
+}
